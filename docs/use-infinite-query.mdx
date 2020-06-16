@@ -15,7 +15,7 @@ function Products(props) {
     {isFetching, isFetchingMore, fetchMore, canFetchMore},
   ] = useInfiniteQuery(
     getProducts,
-    (page = {first: 100, skip: 0}) => ({where: {storeId: props.storeId}, ...page}),
+    (page = {take: 100, skip: 0}) => ({where: {storeId: props.storeId}, ...page}),
     {
       getFetchMore: (lastGroup, allGroups) => lastGroup.nextPage,
     },
@@ -53,19 +53,19 @@ And here's the query to work with that:
 export default async function getProducts({
   where,
   orderBy,
-  first,
+  take,
   skip,
 }: GetProductsInput) {
   const products = await db.product.findMany({
     where,
     orderBy,
-    first,
+    take,
     skip,
   })
 
   const count = await db.product.count()
   const hasMore = skip < count
-  const nextPage = hasMore ? {first, skip: skip + first} : null
+  const nextPage = hasMore ? {take, skip: skip + take} : null
 
   return {
     products,
